@@ -1,0 +1,128 @@
+<form>
+  <label>Gplay</label>
+  <search id="base_search">
+    <query> index=google|rename "Last Updated" as date|rename "Current Ver" as cv|rename "Android Ver" as av|table App,Category,Rating,Reviews,Size,Installs,Type,Price,Content,Rating,Genres,"date","cv","av" |eval yearf = strptime(date,"%b %d,%Y")| eval year = strftime(yearf, "%Y")|fields - yearf,date,Content</query>
+  </search>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="dropdown" token="year" searchWhenChanged="false">
+      <label>Year</label>
+      <search base="base_search">
+        <query>|stats count by year</query>
+      </search>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>year</fieldForLabel>
+      <fieldForValue>year</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="cv" searchWhenChanged="false">
+      <label>Current_Version</label>
+      <search base="base_search">
+        <query>|dedup cv</query>
+      </search>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>cv</fieldForLabel>
+      <fieldForValue>cv</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="av" searchWhenChanged="false">
+      <label>Android_Version</label>
+      <search base="base_search">
+        <query>|dedup av</query>
+      </search>
+      <choice value="*">ALl</choice>
+      <default>*</default>
+      <fieldForLabel>av</fieldForLabel>
+      <fieldForValue>av</fieldForValue>
+    </input>
+    <input type="dropdown" token="cat" searchWhenChanged="false">
+      <label>Category</label>
+      <search base="base_search">
+        <query>|stats count by Category</query>
+      </search>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <fieldForLabel>Category</fieldForLabel>
+      <fieldForValue>Category</fieldForValue>
+    </input>
+    <input type="dropdown" token="gen" searchWhenChanged="false">
+      <label>Generes</label>
+      <search base="base_search">
+        <query>|stats count by Genres</query>
+      </search>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <fieldForLabel>Genres</fieldForLabel>
+      <fieldForValue>Genres</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Total App Download</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|dedup "App"|stats count</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0x53a051"]</option>
+        <option name="underLabel">Total App Download</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Total App Version</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|dedup App |stats count by av</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Installation</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|stats count by Installs</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Genres</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|stats count by Genres</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Category</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|stats count by Category</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>App Downlaod</title>
+        <search base="base_search">
+          <query>|search year = $year$ Genres=$gen$ Category=$cat$ av=$av$|dedup App</query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
